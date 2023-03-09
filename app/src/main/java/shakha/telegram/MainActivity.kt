@@ -68,14 +68,19 @@ class MainActivity : AppCompatActivity(), RvEvent {
                                 "${first.text.toString()}  Saved",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            if (type == 0) {
-                                sortList()
-                            } else if (type == 1) {
-                                ReSortList()
-                            } else if (type == 2) {
-                                sortList()
-                            } else {
-                                ReSortList()
+                            when (type) {
+                                0 -> {
+                                    sortList()
+                                }
+                                1 -> {
+                                    ReSortList()
+                                }
+                                2 -> {
+                                    sortList()
+                                }
+                                else -> {
+                                    ReSortList()
+                                }
                             }
                             dialog.dismiss()
                             rvAdapter.notifyDataSetChanged()
@@ -121,6 +126,7 @@ class MainActivity : AppCompatActivity(), RvEvent {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun menuClick(info: Profile, more: ImageView) {
         val popupMenu = PopupMenu(this@MainActivity, more)
         popupMenu.inflate(R.menu.my_menu)
@@ -128,14 +134,19 @@ class MainActivity : AppCompatActivity(), RvEvent {
             when (it.itemId) {
                 R.id.delete -> {
                     myDBHelper.deletePro(info)
-                    if (type == 0) {
-                        sortList()
-                    } else if (type == 1) {
-                        ReSortList()
-                    } else if (type == 2) {
-                        sortList()
-                    } else {
-                        ReSortList()
+                    when (type) {
+                        0 -> {
+                            sortList()
+                        }
+                        1 -> {
+                            ReSortList()
+                        }
+                        2 -> {
+                            sortList()
+                        }
+                        else -> {
+                            ReSortList()
+                        }
                     }
                     rvAdapter.list = list
                     rvAdapter.notifyDataSetChanged()
@@ -164,14 +175,19 @@ class MainActivity : AppCompatActivity(), RvEvent {
                             info.info = itemDialogBinding.second.text.toString().trim()
                             info.img = absolutePath
                             myDBHelper.editPro(info)
-                            if (type == 0) {
-                                sortList()
-                            } else if (type == 1) {
-                                ReSortList()
-                            } else if (type == 2) {
-                                sortList()
-                            } else {
-                                ReSortList()
+                            when (type) {
+                                0 -> {
+                                    sortList()
+                                }
+                                1 -> {
+                                    ReSortList()
+                                }
+                                2 -> {
+                                    sortList()
+                                }
+                                else -> {
+                                    ReSortList()
+                                }
                             }
                             dialog.dismiss()
                             rvAdapter.list = list

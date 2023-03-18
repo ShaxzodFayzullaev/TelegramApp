@@ -3,8 +3,7 @@ package shakha.telegram
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -16,10 +15,13 @@ import shakha.telegram.adapters.RvEvent
 import shakha.telegram.databinding.ActivityMainBinding
 import shakha.telegram.databinding.ItemDialogBinding
 import shakha.telegram.db.MyDBHelper
+import shakha.telegram.db.MyDBHelper.Companion.ASC
+import shakha.telegram.db.MyDBHelper.Companion.DESC
+import shakha.telegram.db.MyDBHelper.Companion.key_data
+import shakha.telegram.db.MyDBHelper.Companion.key_name
 import shakha.telegram.models.Profile
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,21 +32,75 @@ class MainActivity : AppCompatActivity(), RvEvent {
     private lateinit var rvAdapter: RvAdapter
     private lateinit var itemDialogBinding: ItemDialogBinding
     private lateinit var absolutePath: String
+    private lateinit var button: ImageButton
     private var list = ArrayList<Profile>()
     var type = 0
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        absolutePath = ""
-        setContentView(binding.root)
-        myDBHelper = MyDBHelper(this)
-        sortList()
-        rvAdapter = RvAdapter(list, this)
-        binding.apply {
-            rv.adapter = rvAdapter
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        absolutePath = ""
+        button = findViewById(R.id.more)
+        myDBHelper = MyDBHelper(this)
+        myDBHelper.getAllPro().forEach {
+            list.add(it)
+        }
+        rvAdapter = RvAdapter(list, this)
+        registerForContextMenu(binding.more)
+        binding.apply {
+            more.setOnClickListener {
+                val popupMenu1 = PopupMenu(this@MainActivity, button)
+                popupMenu1.menuInflater.inflate(R.menu.my_menu2, popupMenu1.menu)
+                popupMenu1.setOnMenuItemClickListener {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Type changed to " + it.title,
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    when (it.itemId) {
+                        R.id.date_up -> {
+                            list.clear()
+                            myDBHelper.getItems(order = ASC, date = key_data).forEach {
+                                list.add(it)
+                            }
+                            rvAdapter.list = list
+                            rvAdapter.notifyDataSetChanged()
+                        }
+                        R.id.date_down -> {
+                            list.clear()
+                            myDBHelper.getItems(order = DESC, date = key_data).forEach {
+                                list.add(it)
+                            }
+                            rvAdapter.list = list
+                            rvAdapter.notifyDataSetChanged()
+                        }
+                        R.id.ZdanAgacha -> {
+                            list.clear()
+                            myDBHelper.getItems(order = DESC, date = key_name).forEach {
+                                list.add(it)
+                            }
+                            rvAdapter.list = list
+                            rvAdapter.notifyDataSetChanged()
+                        }
+                        R.id.AdanZgacha -> {
+                            list.clear()
+                            myDBHelper.getItems(order = ASC, date = key_name).forEach {
+                                list.add(it)
+                            }
+                            rvAdapter.list = list
+                            rvAdapter.notifyDataSetChanged()
+                        }
+
+                    }
+                    true
+                }
+                popupMenu1.show()
+            }
+            rv.adapter = rvAdapter
             btnAdd.setOnClickListener {
                 val dialog = BottomSheetDialog(binding.root.context, R.style.NewDialog)
                 itemDialogBinding = ItemDialogBinding.inflate(layoutInflater)
@@ -53,42 +109,47 @@ class MainActivity : AppCompatActivity(), RvEvent {
                     itemDialogBinding.image.setOnClickListener {
                         getImageContent.launch("image/*")
                     }
-
                     btnSave.setOnClickListener {
                         if (first.text!!.isNotBlank() && second.text!!.isNotBlank()) {
-                            val profile = Profile(
+                            val info = Profile(
                                 null,
                                 first.text.toString().trim(),
                                 second.text.toString().trim(),
-                                absolutePath
+                                absolutePath,
+                                SimpleDateFormat("HH:mm dd-MM-yyyy").format(Calendar.getInstance().time)
                             )
-                            myDBHelper.addPro(profile)
+
                             Toast.makeText(
                                 this@MainActivity,
                                 "${first.text.toString()}  Saved",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            when (type) {
-                                0 -> {
-                                    sortList()
-                                }
-                                1 -> {
-                                    ReSortList()
-                                }
-                                2 -> {
-                                    sortList()
-                                }
-                                else -> {
-                                    ReSortList()
-                                }
-                            }
+
                             dialog.dismiss()
-                            rvAdapter.notifyDataSetChanged()
+                            myDBHelper.addPro(info)
+                            list.add(info)
                             rvAdapter.list = list
+                            rvAdapter.notifyDataSetChanged()
                             absolutePath = ""
-                        } else {
+                        } else if (first.text!!.isBlank() && second.text!!.isNotBlank()) {
                             Toast.makeText(
-                                this@MainActivity, "Enter information", Toast.LENGTH_SHORT
+                                this@MainActivity, "Ismni kiriting", Toast.LENGTH_SHORT
+                            ).show()
+                        } else if (second.text!!.isBlank() && first.text!!.isNotBlank()) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Ma'lumotni kiriting",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } else if (first.text!!.isNotBlank() && second.text!!.isNotBlank()) {
+                            Toast.makeText(this@MainActivity, "Rasmni tanlang", Toast.LENGTH_SHORT)
+                                .show()
+                        } else if (first.text!!.isBlank() && second.text!!.isBlank()) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Barcha bosh qatorlarni toldiring",
+                                Toast.LENGTH_SHORT
                             ).show()
                         }
                     }
@@ -98,73 +159,66 @@ class MainActivity : AppCompatActivity(), RvEvent {
         }
     }
 
-    private fun sortList() {
-        list.clear()
-        for (word in 'A'..'Z') {
-            myDBHelper.getAllPro().forEach {
-                if (it.name?.substring(0, 1)?.lowercase() == word.toString()
-                        .lowercase() && it.name?.substring(0, 1)?.uppercase() == word.toString()
-                        .uppercase()
-                ) {
-                    list.add(it)
-                }
-            }
-        }
-    }
+//    private fun sortList() {
 
-    private fun ReSortList() {
-        list.clear()
-        for (word in 'Z' downTo 'A') {
-            myDBHelper.getAllPro().forEach {
-                if (it.name?.substring(0, 1)?.lowercase() == word.toString()
-                        .lowercase() && it.name?.substring(0, 1)?.uppercase() == word.toString()
-                        .uppercase()
-                ) {
-                    list.add(it)
-                }
-            }
-        }
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    override fun menuClick(info: Profile, more: ImageView) {
-        val popupMenu = PopupMenu(this@MainActivity, more)
+    @SuppressLint("SimpleDateFormat", "NotifyDataSetChanged")
+    override fun menuClick(info: Profile, view: ImageView) {
+        val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(R.menu.my_menu)
         popupMenu.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.delete -> {
                     myDBHelper.deletePro(info)
-                    when (type) {
-                        0 -> {
-                            sortList()
-                        }
-                        1 -> {
-                            ReSortList()
-                        }
-                        2 -> {
-                            sortList()
-                        }
-                        else -> {
-                            ReSortList()
-                        }
+                    list.forEachIndexed { index, it ->
+                        it.id == info.id
+                        list.set(index, info)
                     }
+                    if (type == 0) {
+                        list.clear()
+                        myDBHelper.getItems(order = ASC, date = key_name).forEach {
+                            list.add(it)
+                        }
+                        rvAdapter.list = list
+                        rvAdapter.notifyDataSetChanged()
+                    } else if (type == 1) {
+                        list.clear()
+                        myDBHelper.getItems(order = DESC, date = key_name).forEach {
+                            list.add(it)
+                        }
+                        rvAdapter.list = list
+                        rvAdapter.notifyDataSetChanged()
+                    } else if (type == 2) {
+                        list.clear()
+                        myDBHelper.getItems(order = ASC, date = key_data).forEach {
+                            list.add(it)
+                        }
+                        rvAdapter.list = list
+                        rvAdapter.notifyDataSetChanged()
+                    } else if (type == 3) {
+                        list.clear()
+                        myDBHelper.getItems(order = DESC, date = key_data).forEach {
+
+                            list.add(it)
+                        }
+                        rvAdapter.list = list
+                        rvAdapter.notifyDataSetChanged()
+                    }
+                    list.remove(info)
                     rvAdapter.list = list
                     rvAdapter.notifyDataSetChanged()
-                    Toast.makeText(this, "${info.name} Deleted", Toast.LENGTH_SHORT).show()
-
-
+                    Toast.makeText(this, "${info.name} O'chirildi", Toast.LENGTH_SHORT).show()
                 }
                 R.id.edit -> {
-                    val dialog = BottomSheetDialog(binding.root.context, R.style.NewDialog)
+                    val dialog = BottomSheetDialog(
+                        binding.root.context,
+                        R.style.NewDialog
+                    )
                     itemDialogBinding = ItemDialogBinding.inflate(layoutInflater)
                     dialog.setContentView(itemDialogBinding.root)
                     itemDialogBinding.first.setText(info.name)
                     itemDialogBinding.second.setText(info.info)
                     itemDialogBinding.image.setImageURI(Uri.parse(info.img))
-                    rvAdapter.list = list
                     absolutePath = info.img.toString()
-
-
 
                     itemDialogBinding.image.setOnClickListener {
                         getImageContent.launch("image/*")
@@ -174,28 +228,58 @@ class MainActivity : AppCompatActivity(), RvEvent {
                             info.name = itemDialogBinding.first.text.toString().trim()
                             info.info = itemDialogBinding.second.text.toString().trim()
                             info.img = absolutePath
+                            info.date = info.date
                             myDBHelper.editPro(info)
-                            when (type) {
-                                0 -> {
-                                    sortList()
+                            list.forEachIndexed { index, it ->
+                                it.id == info.id
+                                list.set(index, info)
+                            }
+
+
+
+                            if (type == 0) {
+                                list.clear()
+                                myDBHelper.getItems(order = ASC, date = key_name).forEach {
+                                    list.add(it)
                                 }
-                                1 -> {
-                                    ReSortList()
+                                rvAdapter.list = list
+                                rvAdapter.notifyDataSetChanged()
+                            } else if (type == 2) {
+
+                                list.clear()
+                                myDBHelper.getItems(order = DESC, date = key_name).forEach {
+                                    list.add(it)
                                 }
-                                2 -> {
-                                    sortList()
+                                rvAdapter.list = list
+                                rvAdapter.notifyDataSetChanged()
+                            } else if (type == 1) {
+                                list.clear()
+                                myDBHelper.getItems(order = ASC, date = key_data).forEach {
+                                    list.add(it)
                                 }
-                                else -> {
-                                    ReSortList()
+                                rvAdapter.list = list
+                                rvAdapter.notifyDataSetChanged()
+
+                            } else if (type == 3) {
+                                list.clear()
+                                myDBHelper.getItems(order = DESC, date = key_data).forEach {
+                                    list.add(it)
                                 }
+                                rvAdapter.list = list
+                                rvAdapter.notifyDataSetChanged()
                             }
                             dialog.dismiss()
                             rvAdapter.list = list
                             rvAdapter.notifyDataSetChanged()
-                            Toast.makeText(this, "Edit", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "${info.name} Taxrirlandi", Toast.LENGTH_SHORT)
+                                .show()
                             absolutePath = ""
                         } else {
-                            Toast.makeText(this, "Enter new Information", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this,
+                                "Barcha bo'sh qatorlarni toldiring",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                     dialog.show()
@@ -207,13 +291,12 @@ class MainActivity : AppCompatActivity(), RvEvent {
         popupMenu.show()
     }
 
-
     @SuppressLint("SimpleDateFormat")
     private val getImageContent = registerForActivityResult(ActivityResultContracts.GetContent()) {
         it ?: return@registerForActivityResult
         itemDialogBinding.image.setImageURI(it)
         val inputStream = contentResolver.openInputStream(it)
-        val title = SimpleDateFormat("yyyyMMdd_hhmm").format(Date())
+        val title = SimpleDateFormat("HH:mm dd-MM-yyyy").format(Date())
         val file = File(filesDir, "$title.jpg")
         val fileOutputStream = FileOutputStream(file)
         inputStream?.copyTo(fileOutputStream)
@@ -222,51 +305,5 @@ class MainActivity : AppCompatActivity(), RvEvent {
         absolutePath = file.absolutePath
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.my_menu2, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsMenuClosed(menu: Menu?) {
-        Toast.makeText(this, "Foydali bo'lganidan hursandman", Toast.LENGTH_SHORT).show()
-        super.onOptionsMenuClosed(menu)
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.AdanZgacha -> {
-                myDBHelper.getAllPro()
-                sortList()
-                rvAdapter.list = list
-                rvAdapter.notifyDataSetChanged()
-                type = 0
-
-            }
-            R.id.ZdanAgacha -> {
-                myDBHelper.getAllPro()
-                ReSortList()
-                rvAdapter.list = list
-                rvAdapter.notifyDataSetChanged()
-                type = 1
-
-            }
-            R.id.osish -> {
-                myDBHelper.getAllPro()
-                sortList()
-                rvAdapter.list = list
-                rvAdapter.notifyDataSetChanged()
-                type = 2
-
-            }
-            R.id.kamayish -> {
-                myDBHelper.getAllPro()
-                ReSortList()
-                rvAdapter.list = list
-                rvAdapter.notifyDataSetChanged()
-                type = 3
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 }
+

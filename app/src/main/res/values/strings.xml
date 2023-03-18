@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Telegram</string>
+    <string name="qo_shish">Qo\'shish</string>
+    <string name="a_z_gacha">A..Z gacha</string>
+    <string name="z_a_gacha">Z..A gacha</string>
+    <string name="o_sish_bo_yicha">O\'sish bo\'yicha</string>
+    <string name="kamayish_bo_yicha">Kamayish bo\'yicha</string>
+    <string name="sanalar_bo_yicha">Sanalar bo\'yicha</string>
+    <string name="sharh_yozing">Sharh yozing</string>
 </resources>

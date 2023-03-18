@@ -4,24 +4,61 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#323131"
+    style="@style/SCREEN"
     tools:context=".MainActivity">
 
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:backgroundTint="#404040"
+        app:layout_constraintBottom_toTopOf="@id/rv"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#2C2C2C"
+            app:cardCornerRadius="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Telegram"
+                android:layout_gravity="start"
+                android:textColor="@color/white"
+                android:textSize="25sp"
+                android:textStyle="italic" />
+
+            <ImageButton
+                android:id="@+id/more"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end"
+                android:background="#2c2c2c"
+                android:src="@drawable/ic_moree" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+    </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top"
         tools:listitem="@layout/item_rv" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#F4F2F2"
-        android:src="@drawable/baseline_edit_24"
+        android:backgroundTint="#D3CECE"
+        android:src="@drawable/add"
+        style="@style/BUTTON"
         android:verticalScrollbarPosition="right"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.96"

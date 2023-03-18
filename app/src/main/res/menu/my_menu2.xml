@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
     <item
         android:id="@+id/AdanZgacha"
-        android:icon="@drawable/baseline_edit_24"
-        android:title="A..Z gacha" />
+        android:title="@string/a_z_gacha" />
     <item
         android:id="@+id/ZdanAgacha"
-        android:icon="@drawable/baseline_delete_24"
-        android:title="Z..A" />
+        android:title="@string/z_a_gacha" />
     <item
-        android:id="@+id/osish"
-        android:icon="@drawable/baseline_delete_24"
-        android:title="O'sish bo'yicha" />
+        android:id="@+id/date_up"
+        android:icon="@drawable/data_up"
+        android:iconTint="@color/white"
+        android:title="sanalar bo'yicha ↑" />
+
     <item
-        android:id="@+id/kamayish"
-        android:icon="@drawable/baseline_delete_24"
-        android:title="Kamayish bo'yicha" />
+        android:id="@+id/date_down"
+        android:icon="@drawable/data_down"
+        android:iconTint="@color/white"
+        android:title="sanalr bo'yicha ↓" />
+
 </menu>

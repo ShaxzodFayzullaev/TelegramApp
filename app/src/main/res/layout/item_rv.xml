@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="78dp"
     android:gravity="center"
+    style="@style/SCREEN"
     android:layout_marginBottom="0.9dp"
     android:orientation="horizontal">
 
@@ -20,20 +21,22 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/image"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_margin="10dp"
-                android:padding="5dp"
-                android:src="@drawable/telegram"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="2dp"
+                android:padding="2dp"
                 android:scaleType="centerCrop"
+                android:src="@drawable/telegram"
                 app:shapeAppearanceOverlay="@style/circleImageView"
                 app:strokeWidth="3dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="61dp"
                 android:layout_gravity="center"
                 android:layout_weight="9"
+                android:layout_marginStart="8dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
@@ -42,44 +45,49 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
+                    style="@style/TEXT"
                     android:text="@string/app_name"
                     android:textColor="@color/white"
-                    android:textSize="25sp"
+                    android:textSize="18sp"
                     android:textStyle="italic" />
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textColor="@color/white"
                     android:id="@+id/txt_izoh"
-                    android:textStyle="italic"
-                    android:textSize="18sp"
-                    />
-                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
+                    style="@style/TEXT"
+
                     android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="italic" />
+
+                <TextView
                     android:id="@+id/txt_date"
-                    android:textStyle="italic"
-                    android:textSize="15sp"
-                    />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    style="@style/TEXT"
+
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textStyle="italic" />
 
             </LinearLayout>
+
             <LinearLayout
-                android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:orientation="vertical"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center_vertical"
-                >
+                android:layout_weight="1"
+                android:orientation="vertical">
+
                 <ImageView
                     android:id="@+id/more"
                     android:layout_width="30dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_moree"
-                    />
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_moree" />
 
             </LinearLayout>
         </LinearLayout>
